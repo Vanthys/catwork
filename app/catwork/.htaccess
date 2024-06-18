@@ -1,0 +1,7 @@
+RewriteEngine On
+RewriteBase /
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+# redirect rule -> every request on localhost/catwork and its sub-paths is redirected to index.php (the entry of our application)
+RewriteRule ^(.*)$ catwork/index.php/$1 [L]
