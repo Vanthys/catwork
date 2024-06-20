@@ -68,7 +68,7 @@ const SearchInput = styled.input`
     }
 `;
 
-function ProfileBubble({ user, modalCallback, filterCallback }) {
+function ProfileBubble({ user, modalCallback, showLoginMask, filterCallback }) {
     const inputRef = useRef(null);
     const [searchExpanded, setSearchExpanded] = useState(false);
     const [inputValue, setInputValue] = useState("");
@@ -102,7 +102,11 @@ function ProfileBubble({ user, modalCallback, filterCallback }) {
     const [modalOpen, setModalOpen] = useState(false);
 
     const toggleModal = () => {
-        setModalOpen(!modalOpen);
+        if (!modalOpen && !user && true){
+            showLoginMask()
+        }else {
+            setModalOpen(!modalOpen);
+        }
     };
     
     return (
@@ -133,6 +137,7 @@ function ProfileBubble({ user, modalCallback, filterCallback }) {
             <h2>Profile</h2>
             <UserProfile name={"Username + change password oder so was weiß ich"} img={"https://cdn2.thecatapi.com/images/bbl.jpg"} bio={"Yeah fuck you"}/>
         </Modal>
+        
       </>
     );
 }

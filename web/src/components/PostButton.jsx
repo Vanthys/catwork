@@ -19,6 +19,11 @@ const ImageWrapper = styled.img`
 width: 3em;
 height: 3em;
 cursor: pointer;
+border-radius: 50%;
+transition: box-shadow 100ms ease-in-out;
+&:hover{
+    box-shadow: 2px 2px 2px 2px #000000c7;
+}
 `;
 
 const PostButton = ({user, showLoginMask, update}) => {

@@ -1,16 +1,22 @@
 import { useRef, useState } from "react";
 import styled from "styled-components"
-
+import media from "styled-media-query";
+import ImageIcon from "../assets/image.svg"
 
 const FormContainer = styled.form`
     display: flex;
     flex-direction: column;
-
+    transition: width 200ms ease-in-out;
+  ${media.lessThan("medium")`
+    width: 80vw;
+  `}
+  ${media.greaterThan("medium")`
+    width: 500px;
+  `}
 `;
 
 const ImageUploadWrapper = styled.div`
   height: 250px;
-  width: 50vw;
   position: relative;
   overflow: hidden;
   border-radius: 0.5em;
@@ -36,6 +42,7 @@ const ImageUploadInput = styled.input`
 
 
 const TitleInput = styled.input`
+   font-family: "Josefin Sans", sans-serif;
     border: none;
     font-size: 1em;
     color: black;
@@ -99,7 +106,7 @@ const PostButton = styled.input`
 
 const NewPost = ({toggleModal, update}) =>{
 
-    const [image, setImage] = useState("https://cdn.iconscout.com/icon/free/png-256/free-image-preview-2715690-2265750.png");
+    const [image, setImage] = useState(ImageIcon);
 
     const ImageInputRef = useRef(null);
     const TitleInputRef = useRef(null);
