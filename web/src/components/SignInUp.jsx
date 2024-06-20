@@ -135,22 +135,24 @@ const SignInUp = () => {
 
     }
 
-    const signIn = () => {
+    const signIn = async (e) => {
+      e.preventDefault();
       fetch("http://127.0.0.1:80/catwork/login", {
         method: "POST",
         headers: {
             "Accept": "application/json",     
-            "Content-Type": "application/json"        
+            "Content-Type": "application/json"
           },
         body: {"user": "admin", "password": "password"}
   })
   .then(response => {
     console.log(response)
+    console.log(response.json())
+    
     if (response.status != 200) {
         console.error("Login Failed")
         return;
     }
-    console.log(response.json())
     })
     ;
 
