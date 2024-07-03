@@ -45,7 +45,7 @@ const ImageUploadInput = styled.input`
 
 
 const TextInput = styled.input`
-    border: none;
+    border:none;
     font-family: "Josefin Sans", sans-serif;
     font-size: 1em;
     color: black;
@@ -57,6 +57,13 @@ const TextInput = styled.input`
     margin-bottom: 1em;
     &:focus{
         outline: none;
+    }
+
+    &:invalid:focus:not(:placeholder-shown) {
+        border-bottom: 4px solid #fc6a6a;
+    }
+    &:invalid:not(:focus):not(:placeholder-shown) {
+      border-bottom: 6px solid #fa3939;
     }
     
 `;
@@ -112,7 +119,13 @@ const SignInUp = ({onClose, setUser}) => {
     }
 
     const [image, setImage] = useState(UserIcon);
+    
+
     const ImageInputRef = useRef(null);
+    const signUpPW = useRef(null);
+    const signUpPWV = useRef(null)
+
+
 
     const handleImageUpload = (e) => {
         const image = e.target.files[0];
@@ -135,8 +148,11 @@ const SignInUp = ({onClose, setUser}) => {
 
     }
 
-    const signIn = async (e) => {
+    // ! SIGN IN
+    const signIn = (e) => {
       e.preventDefault();
+      const username = e.target.username.value;
+      const password = e.target.password.value; 
       fetch("http://127.0.0.1:80/catwork/login", {
         method: "POST",
         headers: {
@@ -144,8 +160,7 @@ const SignInUp = ({onClose, setUser}) => {
             "Content-Type": "application/json"
           },
         credentials: 'include',
-        body: JSON.stringify({"user": "admin", "password": "password"})
-       
+        body: JSON.stringify({"user": username, "password": password})
       })
       .then((res) => res.json())
       .then((data) => {
@@ -157,19 +172,64 @@ const SignInUp = ({onClose, setUser}) => {
       .catch((error) => {
         console.error('Error:', error);
       });
-
-
     } 
 
+
+    const validatePassword = (e) => {
+      if(signUpPW.current.value != signUpPWV.current.value) {
+        signUpPWV.current.setCustomValidity("passwords don't match");
+      } else {
+        signUpPWV.current.setCustomValidity('');
+      }
+    }
+
+    // ! SIGN UP
+    const signUp = (e) => {
+      e.preventDefault();
+      const username = e.target.username.value;
+      const password = e.target.password.value;
+      const confirmpassword = e.target.passwordv.value;
+      const description = e.target.description.value;
+      
+
+      if (password!=confirmpassword)
+        {
+          alert("Passwords do not match")
+          return;
+        }
+      
+      
+      fetch("http://127.0.0.1:80/catwork/signup", {
+        method: "POST",
+        headers: {
+            "Accept": "application/json",     
+            "Content-Type": "application/json"
+          },
+        credentials: 'include',
+        body: JSON.stringify({"username": username, "password": password, "description": description, "image": image})
+      })
+      .then((res) => {console.log(res); return res.json()})
+      .then((data) => {
+        console.log(data)
+        setUser(data["user"]);
+        document.cookie = "id=" + data["cookie"] + ";";
+        onClose();
+        
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+    }
+
     return (
-    <LayoutContainer>
+    <LayoutContainer onSubmit={(e) => mode ? signIn(e) : signUp(e)}>
         {mode && 
         <>
         <h2>sign in</h2>
-            <TextInput type="text" placeholder="username"/>
-            <TextInput type="password" placeholder="password"/>
+            <TextInput name="username" type="text" placeholder="username" minLength="4" maxLength="25" pattern="[a-zA-Z0-9_.]{4,25}" required/>
+            <TextInput name="password" type="password" placeholder="password" minLength="4" maxLength="25" pattern=".{4,25}" required/>
             <ActionButtonWrapper>
-              <ActionButton onClick={(e) => signIn(e)} type="submit" value="sign in"/>
+              <ActionButton type="submit" value="sign in"/>
             </ActionButtonWrapper>
         </>
         }
@@ -184,11 +244,13 @@ const SignInUp = ({onClose, setUser}) => {
                 accept="image/png,image/jpeg">
                 </ImageUploadInput>    
         </ImageUploadWrapper>
-        <TextInput type="text" placeholder="username"/>
-        <TextInput type="password" placeholder="password"/>
-        <TextInput type="text" placeholder="Description"/>
+        <TextInput type="text" name="username" placeholder="username" required pattern="[a-zA-Z0-9_.]{4,25}"/>
+        <TextInput type="password" ref={signUpPW} onChange={validatePassword} name="password" placeholder="password" required pattern=".{4,25}"/>
+        <TextInput type="password" ref={signUpPWV} onChange={validatePassword} name="passwordv" placeholder="confirm password" required/>
+        
+        <TextInput type="textbox" name="description" placeholder="description"/>
         <ActionButtonWrapper>
-              <ActionButton onClick={(e) => signUp(e)} type="submit" value="sign up"/>
+              <ActionButton type="submit" value="sign up"/>
         </ActionButtonWrapper>
         </>
         }

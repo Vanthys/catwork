@@ -23,7 +23,6 @@ const [loginMask, setLoginMask] = useState(false)
 
 
 useEffect(() => {
-  console.log(user);
   //console.log(document.cookie["user"]);
 },[user])
 
