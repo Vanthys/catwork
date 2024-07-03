@@ -35,7 +35,7 @@ const PostButton = ({user, showLoginMask, update}) => {
     };
     
     const handle_click = () => {
-        if (false){
+        if (!user){
             showLoginMask()
         }
         else{
@@ -50,7 +50,7 @@ const PostButton = ({user, showLoginMask, update}) => {
     </Container>
     <Modal isOpen={modalOpen} onClose={toggleModal}>
             <h2>New Post</h2>
-            <NewPost toggleModal={toggleModal} update={update}/>
+            <NewPost toggleModal={toggleModal} update={update} user={user}/>
     </Modal>
     </>
    

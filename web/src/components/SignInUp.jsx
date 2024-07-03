@@ -102,7 +102,7 @@ const ActionButton = styled.input`
     }
 `;
 
-const SignInUp = () => {
+const SignInUp = ({onClose, setUser}) => {
 
     const [mode, setMode] = useState(true)
 
@@ -143,18 +143,21 @@ const SignInUp = () => {
             "Accept": "application/json",     
             "Content-Type": "application/json"
           },
-        body: {"user": "admin", "password": "password"}
-  })
-  .then(response => {
-    console.log(response)
-    console.log(response.json())
-    
-    if (response.status != 200) {
-        console.error("Login Failed")
-        return;
-    }
-    })
-    ;
+        credentials: 'include',
+        body: JSON.stringify({"user": "admin", "password": "password"})
+       
+      })
+      .then((res) => res.json())
+      .then((data) => {
+        setUser(data["user"]);
+        document.cookie = "id=" + data["cookie"] + ";";
+        onClose();
+        
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+
 
     } 
 
@@ -162,17 +165,17 @@ const SignInUp = () => {
     <LayoutContainer>
         {mode && 
         <>
-        <h2>Sign in</h2>
+        <h2>sign in</h2>
             <TextInput type="text" placeholder="username"/>
             <TextInput type="password" placeholder="password"/>
             <ActionButtonWrapper>
-              <ActionButton onClick={(e) => signIn(e)} type="submit" value="Sign in"/>
+              <ActionButton onClick={(e) => signIn(e)} type="submit" value="sign in"/>
             </ActionButtonWrapper>
         </>
         }
         {!mode &&
         <>
-        <h2>Sign Up</h2>
+        <h2>sign up</h2>
         <ImageUploadWrapper $image={image}>
                 <ImageUploadInput
                 type="file"
@@ -185,12 +188,12 @@ const SignInUp = () => {
         <TextInput type="password" placeholder="password"/>
         <TextInput type="text" placeholder="Description"/>
         <ActionButtonWrapper>
-              <ActionButton onClick={(e) => signUp(e)} type="submit" value="Sign Up"/>
+              <ActionButton onClick={(e) => signUp(e)} type="submit" value="sign up"/>
         </ActionButtonWrapper>
         </>
         }
 
-        <SubSwitch onClick={() => toggleMode()}>{mode && "Click to register"}{!mode && "Click to signin"}</SubSwitch>
+        <SubSwitch onClick={() => toggleMode()}>{mode && "click to register"}{!mode && "click to signin"}</SubSwitch>
     </LayoutContainer>
     );
   };

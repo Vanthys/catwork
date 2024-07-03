@@ -47,10 +47,15 @@ const ModalContent = styled.div`
 
 
 const Modal = ({ isOpen, onClose, children }) => {
+  
+  const clonedChildren = React.Children.map(children, child => {
+    return React.cloneElement(child, { onClose });
+  });
+
   return (
     <ModalOverlay $isOpen={isOpen} onClick={onClose}>
       <ModalContent onClick={e => e.stopPropagation()}>
-        {children}
+        {clonedChildren}
       </ModalContent>
     </ModalOverlay>
   );

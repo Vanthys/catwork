@@ -3,6 +3,8 @@ import SearchIcon from '../assets/search.svg';
 import styled from "styled-components";
 import Modal from "./Modal";
 import UserProfile from "./UserProfile";
+import UserIcon from '../assets/user.svg';
+
 const Container = styled.div`
     transform: translateZ(0); /* Promote to its own layer */
     will-change: top;
@@ -68,10 +70,35 @@ const SearchInput = styled.input`
     }
 `;
 
-function ProfileBubble({ user, modalCallback, showLoginMask, filterCallback }) {
+
+const ActionButtonWrapper = styled.div`
+    display: flex;
+    width: 100%;
+    justify-content: center;    
+`;
+
+const ActionButton = styled.button`
+    font-weight: 700;
+    width: 5em;
+    background-color: white;
+    color: black;
+    border: none;
+    border-radius: 1em;
+    padding: 0.5em;
+    transition: box-shadow 200ms ease-in-out;
+    &:focus{
+        outline: none;
+    }
+    &:hover{
+        box-shadow: 7px 6px 20px #0000009e;
+    }
+`;
+
+function ProfileBubble({ user, showLoginMask, setUser, filterCallback }) {
     const inputRef = useRef(null);
     const [searchExpanded, setSearchExpanded] = useState(false);
     const [inputValue, setInputValue] = useState("");
+
 
     useEffect(() => {
         if (inputRef.current) {
@@ -113,9 +140,17 @@ function ProfileBubble({ user, modalCallback, showLoginMask, filterCallback }) {
         <> 
         <Container >
             <ImgContainer onClick={toggleModal}>
-                <ProfileImg src="https://cdn2.thecatapi.com/images/bbl.jpg" />
+                <ProfileImg src={user?.image ?? UserIcon} />
             </ImgContainer>
-            <UserName onClick={toggleModal}>Cat Lover</UserName>
+            <UserName onClick={toggleModal}>
+                {user?.username ||
+                (
+                <ActionButtonWrapper>
+                    <ActionButton>sign in</ActionButton>
+                </ActionButtonWrapper>
+                )
+            }
+            </UserName>
             <SearchContainer>
                 <SearchInput
                     style={{ display: searchExpanded ? "block" : "none" }}
@@ -135,7 +170,11 @@ function ProfileBubble({ user, modalCallback, showLoginMask, filterCallback }) {
         </Container>
         <Modal isOpen={modalOpen} onClose={toggleModal}>
             <h2>Profile</h2>
-            <UserProfile name={"Username + change password oder so was weiß ich"} img={"https://cdn2.thecatapi.com/images/bbl.jpg"} bio={"Yeah fuck you"}/>
+            <UserProfile 
+            name={user?.username} 
+            img={user?.image} 
+            bio={user?.description}
+            setUser={setUser}/>
         </Modal>
         
       </>
