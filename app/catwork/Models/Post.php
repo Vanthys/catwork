@@ -12,6 +12,7 @@ class Models_Post extends Models_Base
         }, $statement->fetchAll(PDO::FETCH_ASSOC));
     }
 
+
     public function findLimit($offset = 0, $limit = 10): array
     {
         $query = "SELECT id, author_id, title, description, image, timestamp FROM post ORDER BY timestamp ASC LIMIT :limit OFFSET :offset;";
@@ -21,7 +22,6 @@ class Models_Post extends Models_Base
             return new Domains_Post($data);
         }, $statement->fetchAll(PDO::FETCH_ASSOC));
     }
-
 
 
     /**
@@ -39,6 +39,7 @@ class Models_Post extends Models_Base
             throw new Exceptions_NotFound();
         }
     }
+
 
     public function insert(Domains_Post $obj): Domains_Post
     {
@@ -62,4 +63,52 @@ class Models_Post extends Models_Base
         $statement = $this->connection->prepare($query);
         $statement->execute([":id" => $id, ":author_id" => $author_id]);
     }
+
+
+    public function set_likes($id, $author_id)
+    {
+        $query = "SELECT liked_by FROM post WHERE id = :id;";
+        $statement = $this->connection->prepare($query);
+        $statement->execute([":id" => $id]);
+        $data = $statement->fetch(PDO::FETCH_ASSOC);
+        if ($data) {
+            $liked_by = json_decode($data['liked_by'], true);
+            if (!in_array($author_id, $liked_by)) {
+                $liked_by[] = $author_id;
+            }
+            $query = "UPDATE post SET liked_by = :liked_by WHERE id = :id;";
+            $statement = $this->connection->prepare($query);
+            $statement->execute([
+                ':liked_by' => json_encode($liked_by),
+                ':id' => $id
+            ]);
+        } else {
+            throw new Exceptions_NotFound();
+        }
+    }
+
+
+    public function remove_likes($id, $author_id)
+    {
+        $query = "SELECT liked_by FROM post WHERE id = :id;";
+        $statement = $this->connection->prepare($query);
+        $statement->execute([":id" => $id]);
+        $data = $statement->fetch(PDO::FETCH_ASSOC);
+        if ($data) {
+            $liked_by = json_decode($data['liked_by'], true);
+            if (!in_array($author_id, $liked_by)) {
+                $liked_by = array_diff($liked_by, [$author_id]);
+            }
+            $query = "UPDATE post SET liked_by = :liked_by WHERE id = :id;";
+            $statement = $this->connection->prepare($query);
+            $statement->execute([
+                ':liked_by' => json_encode($liked_by),
+                ':id' => $id
+            ]);
+        } else {
+            throw new Exceptions_NotFound();
+        }
+    }
+
+
 }

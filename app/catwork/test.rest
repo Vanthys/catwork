@@ -8,3 +8,6 @@ Accept: application/json
 
 ###
 
+
+ POST http://localhost/catwork/like/1
+
