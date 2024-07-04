@@ -14,14 +14,11 @@ class Controllers_Post extends Controllers_Base
 
     public function get()
     {
-//        Utils_Login::check_session_or_error();
-        if ($this->params) {
-            $data = $this->model->findById($this->params[0]);
-        } else {
-            $data = $this->model->findAll();
-        }
+//      Utils_Login::check_session_or_error();
+        $data = $this->model->findAll();
         $this->view->render($data);
     }
+
 
     public function post()
     {
@@ -45,12 +42,14 @@ class Controllers_Post extends Controllers_Base
     }
 
 
-
     public function delete() {
         if (!isset($this->params[0]) or !isset($this->params[1])) {
-            throw new Exception("Id not found");
+            http_response_code(400);
+            echo json_encode(['error' => 'Problem while deleting']);
+            die();
         }
         $this->model->delete($this->params[0],$this->params[1]);
         http_response_code(204);
     }
+
 }
