@@ -19,10 +19,12 @@ const [user, setUser] = useState(null)
 
 const [loginMask, setLoginMask] = useState(false)
 
+
+
+
 useEffect(() => {
-  console.log(document.cookie["user"]);
-  fetch(user)
-},[])
+  //console.log(document.cookie["user"]);
+},[user])
 
 const showLoginMask = () => {
   setLoginMask(true)
@@ -33,12 +35,12 @@ const update = () => {
 }
   return (
     <>
-      <ProfileBubble user={user} showLoginMask={showLoginMask} filterCallback={setFilter}/>
+      <ProfileBubble user={user} showLoginMask={showLoginMask} filterCallback={setFilter} setUser={setUser}/>
       <Feed filter={filter}/>
-      <PostButton update={update}/>
+      <PostButton update={update} showLoginMask={showLoginMask} user={user}/>
 
       <Modal isOpen={loginMask} onClose={() => setLoginMask(false)}>
-        <SignInUp/>
+        <SignInUp setUser={(hash) => setUser(hash)}/>
       </Modal>
     </>
   )

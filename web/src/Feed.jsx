@@ -106,7 +106,8 @@ function Feed({filter}) {
                   method: "GET",
                   headers: {
                           "Accept": "application/json"
-                  }
+                  },
+                  credentials: 'include'
             });
       const data = await response.json()
       setPosts([...data]);

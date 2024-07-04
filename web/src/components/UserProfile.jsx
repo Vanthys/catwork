@@ -20,11 +20,16 @@ const LayoutContainer = styled.div`
 
 const NameOptions = styled.div`
  grid-area: name;
+ display: flex;
+ flex-direction: column;
+ justify-content: center;
+ align-items: center;
  border-radius: 1em;
 //background-color: #3a5e6b;
 
 padding: 1em;
 `;
+
 
 
 const ProfileImage = styled.img`
@@ -46,6 +51,7 @@ padding: 1em;
 `;
 
 const LogOutButtonWrapper = styled.div`
+    margin-top: 1em;
     display: flex;
     width: 100%;
     justify-content: center;    
@@ -68,13 +74,26 @@ const LogOutButton = styled.button`
     }
 `;
 
-const UserProfile = ({name, bio, img}) => {
+const UserProfile = ({name, bio, img, onClose, setUser}) => {
+
+
+  const LogOut = (e) => {
+    fetch("http://localhost:80/catwork/logout", {
+      method: "GET",
+      credentials: 'include'
+    });
+  setUser(null)
+  onClose();
+  }
+
     return (
     <LayoutContainer>
         <NameOptions>
-          {name}
+          <h2>
+            {name}
+          </h2>
           <LogOutButtonWrapper>
-            <LogOutButton>Log out</LogOutButton>
+            <LogOutButton onClick={(e) => LogOut(e)}>Log out</LogOutButton>
           </LogOutButtonWrapper>
         </NameOptions>
         <ProfileImage src={img}/>

@@ -22,7 +22,7 @@ const ImageUploadWrapper = styled.div`
   border-radius: 0.5em;
 
   /* default image */
-  background: url('${props=> props.$image}');
+  background: url('${props => props.$image}');
   background-color: #ffffff54;
   background-position: center;
   background-repeat: no-repeat;
@@ -104,7 +104,7 @@ const PostButton = styled.input`
 
 
 
-const NewPost = ({toggleModal, update}) =>{
+const NewPost = ({ user, toggleModal, update }) => {
 
     const [image, setImage] = useState(ImageIcon);
 
@@ -124,70 +124,74 @@ const NewPost = ({toggleModal, update}) =>{
 
         const fileReader = new FileReader();
         fileReader.readAsDataURL(image);
-      
+
         fileReader.onload = (fileReaderEvent) => {
-          
-          setImage(fileReaderEvent.target.result)
-         
+
+            setImage(fileReaderEvent.target.result)
+
         }
     }
 
     const handlePost = (e) => {
         e.preventDefault();
         const payload = {
-            "author_id" : 1,
-            "title" : TitleInputRef.current.value,
-            "description" : DescriptionInputRef.current.value,
-            "image" : image,
-            "timestamp" : Date.now()
+            "author_id": user?.id,
+            "title": TitleInputRef.current.value,
+            "description": DescriptionInputRef.current.value,
+            "image": image,
+            "timestamp": Date.now()
         }
         fetch("http://127.0.0.1:80/catwork/post", {
-                        method: "POST",
-                        headers: {
-                            "Accept": "application/json",     
-                            "Content-Type": "application/json"        
-                          },
-                        body: JSON.stringify(payload)
-                  })
-                  .then(response => {
-                    console.log(response)
-                    if (response.status != 301) {
-                        console.error("Failed to post new post. Are you logged in?")
-                        return;
-                    }
-                    update();
-                    toggleModal();
-                    })
-                    ;
-    
+            method: "POST",
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+            },
+            credentials: 'include',
+            body: JSON.stringify(payload)
+        })
+            
+            .then((res) => {
+                if (res.status != 301) {
+                    throw new error;
+                }
+                return res.json()})
+            .then((data) => {
+                update();
+                toggleModal();
+            })
+            .catch((error) => {
+                console.error("Failed to post new post. Are you logged in?", error)
+            });
+
     }
 
     return (
         <>
-        <FormContainer>
-            <ImageUploadWrapper $image={image}>
-                <ImageUploadInput
-                type="file"
-                ref={ImageInputRef}
-                onChange={(e) => handleImageUpload(e)}
-                accept="image/png,image/jpeg">
-                </ImageUploadInput>    
-            </ImageUploadWrapper>
-            <br/>
-            <label>
-                Title
-            </label>
-            <TitleInput type="text" placeholder="Title..." ref={TitleInputRef}/>
-            <br/>
-            <label>
-                Description
-            </label>
-            <DescriptionInput type="textarea" placeholder="Description..." ref={DescriptionInputRef}/>
-        </FormContainer>
-        <br/>
-        <PostButtonWrapper>
-            <PostButton onClick={(e) => handlePost(e)} type="submit" value="Post"/>
-        </PostButtonWrapper>
+            <FormContainer>
+                <ImageUploadWrapper $image={image}>
+                    <ImageUploadInput
+                        type="file"
+                        ref={ImageInputRef}
+                        onChange={(e) => handleImageUpload(e)}
+                        accept="image/png,image/jpeg">
+                    </ImageUploadInput>
+                </ImageUploadWrapper>
+                <br />
+                <label>
+                    Title
+                </label>
+                <TitleInput type="text" placeholder="Title..." ref={TitleInputRef} />
+                <br />
+                <label>
+                    Description
+                </label>
+                <DescriptionInput type="textarea" placeholder="Description..." ref={DescriptionInputRef} />
+            </FormContainer>
+            <br />
+            <PostButtonWrapper>
+                <PostButton onClick={(e) => handlePost(e)} type="submit" value="Post" />
+            </PostButtonWrapper>
         </>
 
     )
