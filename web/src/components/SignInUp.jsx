@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { useState, useRef} from "react";
 import UserIcon from '../assets/user.svg';
 import media from "styled-media-query";
+import { toast } from "react-toastify";
 
 const LayoutContainer = styled.form`
   display: flex;
@@ -129,6 +130,9 @@ const SignInUp = ({onClose, setUser}) => {
 
     const handleImageUpload = (e) => {
         const image = e.target.files[0];
+        if (!image)
+          return;
+
         if (!image.type.includes('image')) {
             return alert('Only images are allowed!');
         }
@@ -166,11 +170,13 @@ const SignInUp = ({onClose, setUser}) => {
       .then((data) => {
         setUser(data["user"]);
         document.cookie = "id=" + data["cookie"] + ";";
+        toast.success("sign in successfull")
         onClose();
         
       })
       .catch((error) => {
-        console.error('Error:', error);
+        //console.error('Error:', error);
+        toast.error("sign in failed")
       });
     } 
 
@@ -194,7 +200,7 @@ const SignInUp = ({onClose, setUser}) => {
 
       if (password!=confirmpassword)
         {
-          alert("Passwords do not match")
+          toast.warn("passwords don't match")
           return;
         }
       
@@ -208,16 +214,27 @@ const SignInUp = ({onClose, setUser}) => {
         credentials: 'include',
         body: JSON.stringify({"username": username, "password": password, "description": description, "image": image})
       })
-      .then((res) => {console.log(res); return res.json()})
+      .then((res) => {
+        if (res.status == 226){
+          toast.error("username taken")
+          throw new "username taken";
+        }
+        if (res.status != 200){
+          throw new "unknown error"
+        }
+        return res.json()
+      })
       .then((data) => {
         console.log(data)
         setUser(data["user"]);
         document.cookie = "id=" + data["cookie"] + ";";
+        toast.success("sign up successful")
         onClose();
         
       })
       .catch((error) => {
-        console.error('Error:', error);
+        //console.error('Error:', error);
+        toast.warn("sign up failed")
       });
     }
 

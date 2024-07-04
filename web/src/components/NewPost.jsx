@@ -3,6 +3,10 @@ import styled from "styled-components"
 import media from "styled-media-query";
 import ImageIcon from "../assets/image.svg"
 
+
+import { toast } from 'react-toastify';
+
+
 const FormContainer = styled.form`
     display: flex;
     flex-direction: column;
@@ -114,12 +118,17 @@ const NewPost = ({ user, toggleModal, update }) => {
 
     const handleImageUpload = (e) => {
         const image = e.target.files[0];
+        if (!image)
+            return;
+
         if (!image.type.includes('image')) {
-            return alert('Only images are allowed!');
+            toast.error('only images are allowed');
+            return;
         }
 
         if (image.size > 10_000_000) {
-            return alert('Maximum upload size is 10MB!');
+            toast.error('maximum upload size is 10mb');
+            return;
         }
 
         const fileReader = new FileReader();
@@ -134,13 +143,21 @@ const NewPost = ({ user, toggleModal, update }) => {
 
     const handlePost = (e) => {
         e.preventDefault();
+
+        if (!image) {
+            toast.warn("no image selected")
+            return
+        }
+
         const payload = {
-            "author_id": user?.id,
+            "author_id": user?.id, //TODO: CHECK IN BACKEND OB AUTHOR_ID == SESSION_ID HASH
             "title": TitleInputRef.current.value,
             "description": DescriptionInputRef.current.value,
             "image": image,
             "timestamp": Date.now()
         }
+
+
         fetch("http://127.0.0.1:80/catwork/post", {
             method: "POST",
             headers: {
@@ -150,18 +167,25 @@ const NewPost = ({ user, toggleModal, update }) => {
             credentials: 'include',
             body: JSON.stringify(payload)
         })
-            
+
             .then((res) => {
                 if (res.status != 301) {
-                    throw new error;
+                    toast.error("upload failed")
                 }
-                return res.json()})
+                return res.json()
+            })
             .then((data) => {
                 update();
                 toggleModal();
+                toast.success("upload sucessfull")
+                setImage(ImageIcon)
+                TitleInputRef.current.value = "";
+                DescriptionInputRef.current.value = "";
+                
             })
             .catch((error) => {
-                console.error("Failed to post new post. Are you logged in?", error)
+                //console.error("Failed to post new post. Are you logged in?", error)
+                toast.error("upload failed")
             });
 
     }
@@ -181,12 +205,12 @@ const NewPost = ({ user, toggleModal, update }) => {
                 <label>
                     Title
                 </label>
-                <TitleInput type="text" placeholder="Title..." ref={TitleInputRef} />
+                <TitleInput type="text" placeholder="title..." ref={TitleInputRef} />
                 <br />
                 <label>
                     Description
                 </label>
-                <DescriptionInput type="textarea" placeholder="Description..." ref={DescriptionInputRef} />
+                <DescriptionInput type="textarea" placeholder="description..." ref={DescriptionInputRef} />
             </FormContainer>
             <br />
             <PostButtonWrapper>

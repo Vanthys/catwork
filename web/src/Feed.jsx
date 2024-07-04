@@ -26,7 +26,7 @@ const PostImg = styled.img`
 `;
 
 const PostDesc = styled.div`
-  flex-wrap: wrap;
+  display: flex;  
   flex-direction: column;
   border-bottom-right-radius: 1em;
   border-bottom-left-radius: 1em;
@@ -34,7 +34,6 @@ const PostDesc = styled.div`
   background-color: #2e4d58; //#343333;
   background: linear-gradient(163deg, rgba(189,139,159,1) 0%, rgba(46,77,88,1) 100%);
   height: 30%;
-  display: flex;
   color: white;
   padding: 0.5em;
 `;
@@ -49,10 +48,20 @@ const FeedWrapper = styled.div`
 `;
 
 const DescriptionHeader = styled.div`
+  display: grid; 
+  grid-auto-columns: 1fr; 
+  grid-template-columns: 75% 10% 7.5% 7.5%; 
+  grid-template-rows: 50% 50%; 
+  gap: 0px 0px; 
+  grid-template-areas: 
+    "title title like like"
+    "author time time time"; 
+    /*
 display: flex;
 flex-direction: row;
 justify-content: space-between;
 flex-wrap: nowrap;
+*/
 & {
   color: #ffffff;
 }
@@ -171,11 +180,11 @@ function Feed({filter}) {
                 <PostImg src={element.image} />
                 <PostDesc>
                   <DescriptionHeader>
-                    <span style={{fontStyle: "italic"}}>{element.title}</span>
-                    <span>&nbsp; - &nbsp;</span>
-                    <span>{element.author_id /*todo replace with name*/}</span> 
-                    <span>{getDateString(element.timestamp)}</span>
-                    <span onClick={() => toggleLike(element.id)}><LikeWrapper src={liked.includes(element.id) ? FullHeart : EmptyHeart }/></span>
+                    <span style={{fontStyle: "italic", "grid-area" : "title"}}>{element.title}</span>
+                    {/*<span style={{"grid"}}>&nbsp; - &nbsp;</span>*/}
+                    <span style={{fontStyle: "italic", "grid-area" : "author"}}>{element.author_id /*todo replace with name*/}</span> 
+                    <span style={{fontStyle: "italic", "grid-area" : "time"}}>{getDateString(element.timestamp)}</span>
+                    <span style={{fontStyle: "italic", "grid-area" : "like"}} onClick={() => toggleLike(element.id)}><LikeWrapper src={liked.includes(element.id) ? FullHeart : EmptyHeart }/></span>
                   </DescriptionHeader>
                   <DescriptionBody>
                     {element.description}
