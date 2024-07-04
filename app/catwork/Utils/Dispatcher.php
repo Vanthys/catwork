@@ -4,7 +4,18 @@ class Utils_Dispatcher
 {
     public function dispatch()
     {
-        $url_elements = explode('/', $_SERVER['PATH_INFO']);
+
+        $url_elements = [];
+        if (isset($_SERVER['PATH_INFO'])) {
+            $url_elements = explode('/', $_SERVER['PATH_INFO']);
+            // Your code using $pathInfo
+        } else {
+            //Show frontend code
+            $html_file = file_get_contents(__DIR__ . '/../../index.html'); // Replace with your React app's index.html path
+            echo $html_file;
+            die();
+        }
+
         $resource_type = $url_elements[1];
 
         $path_params = array_slice($url_elements, 2);
@@ -26,7 +37,10 @@ class Utils_Dispatcher
 
             if ($verb === "put" || $verb === "post") {
                 $input = file_get_contents("php://input");
-                $data = json_decode($input, true);
+                $data = "";
+                if ($input != null){
+                    $data = json_decode($input, true);
+                }
                 if (json_last_error() !== JSON_ERROR_NONE) {
                     throw new Exception('Invalid JSON');
                 }

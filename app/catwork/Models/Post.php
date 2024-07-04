@@ -4,7 +4,7 @@ class Models_Post extends Models_Base
 {
     public function findAll(): array
     {
-        $statement = "SELECT id, author_id, title, description, image, timestamp FROM post ORDER BY timestamp DESC;";
+        $statement = "SELECT id, author_id, liked_by, title, description, image, timestamp FROM post ORDER BY timestamp DESC;";
 
         $statement = $this->connection->query($statement);
         return array_map(function ($data) {
@@ -12,10 +12,9 @@ class Models_Post extends Models_Base
         }, $statement->fetchAll(PDO::FETCH_ASSOC));
     }
 
-
     public function findLimit($offset = 0, $limit = 10): array
     {
-        $query = "SELECT id, author_id, title, description, image, timestamp FROM post ORDER BY timestamp ASC LIMIT :limit OFFSET :offset;";
+        $query = "SELECT id, author_id, liked_by, title, description, image, timestamp FROM post ORDER BY timestamp ASC LIMIT :limit OFFSET :offset;";
         $statement = $this->connection->prepare($query);
         $statement->execute([':id' => $limit, ':offset' => $offset]);
         return array_map(function ($data) {
@@ -24,12 +23,13 @@ class Models_Post extends Models_Base
     }
 
 
+
     /**
      * @throws Exceptions_NotFound
      */
     public function findById($id): Domains_Post
     {
-        $query = "SELECT id, author_id, title, description, image, timestamp FROM post WHERE id = :id;";
+        $query = "SELECT id, author_id, liked_by, title, description, image, timestamp FROM post WHERE id = :id;";
         $statement = $this->connection->prepare($query);
         $statement->execute([':id' => $id]);
         $data = $statement->fetch(PDO::FETCH_ASSOC);
@@ -39,7 +39,6 @@ class Models_Post extends Models_Base
             throw new Exceptions_NotFound();
         }
     }
-
 
     public function insert(Domains_Post $obj): Domains_Post
     {
@@ -72,7 +71,8 @@ class Models_Post extends Models_Base
         $statement->execute([":id" => $id]);
         $data = $statement->fetch(PDO::FETCH_ASSOC);
         if ($data) {
-            $liked_by = json_decode($data['liked_by'], true);
+            $liked_by = (array)json_decode($data['liked_by']);
+
             if (!in_array($author_id, $liked_by)) {
                 $liked_by[] = $author_id;
             }
@@ -95,8 +95,8 @@ class Models_Post extends Models_Base
         $statement->execute([":id" => $id]);
         $data = $statement->fetch(PDO::FETCH_ASSOC);
         if ($data) {
-            $liked_by = json_decode($data['liked_by'], true);
-            if (!in_array($author_id, $liked_by)) {
+            $liked_by = (array)json_decode($data['liked_by']);
+            if (in_array($author_id, $liked_by)) {
                 $liked_by = array_diff($liked_by, [$author_id]);
             }
             $query = "UPDATE post SET liked_by = :liked_by WHERE id = :id;";
@@ -109,6 +109,5 @@ class Models_Post extends Models_Base
             throw new Exceptions_NotFound();
         }
     }
-
 
 }

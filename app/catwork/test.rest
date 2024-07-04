@@ -1,13 +1,57 @@
 
-###
-
-
-###
-GET http://localhost/catwork/post/
+### Get all posts
+GET http://localhost/catwork/post
 Accept: application/json
 
-###
 
 
- POST http://localhost/catwork/like/1
 
+
+
+### Login
+POST http://localhost/catwork/login
+Accept: application/json
+Content-Type: application/json
+
+{ "user": "admin",
+    "password": "password"}
+
+
+### SignUp
+POST http://localhost/catwork/signup
+Accept: application/json
+Content-Type: application/json
+
+{ "username": "admin", "password" : "doesn't matter"}
+
+
+
+### Get User Details
+GET http://localhost/catwork/user/admin
+Accept: application/json
+
+
+### Logout
+GET http://localhost/catwork/logout
+
+
+
+### Post new Image
+POST http://localhost/catwork/post
+Accept: application/json
+Content-Type: application/json
+
+{
+  "author_id" : 1,
+  "title" :  "test",
+  "description" : null,
+  "image" : "",
+  "timestamp" : null
+}
+
+
+### Like Image
+POST http://localhost/catwork/like/1
+
+### Remove Like Image
+DELETE http://localhost/catwork/like/1

@@ -10,7 +10,7 @@ class Domains_Post extends Domains_Base
             "title" => null,
             "description" => null,
             "image" => null,
-            "liked_by" => null,
+            "liked_by" => [],
             "timestamp" => null];
         parent::__construct($data);
     }

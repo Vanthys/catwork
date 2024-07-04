@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import styled from "styled-components";
 import EmptyHeart from "./assets/heart_empty.svg";
 import FullHeart from "./assets/heart_full.svg";
+import { toast } from "react-toastify";
 
 
 const PostWrapper = styled.div`
@@ -56,12 +57,6 @@ const DescriptionHeader = styled.div`
   grid-template-areas: 
     "title title like like"
     "author time time time"; 
-    /*
-display: flex;
-flex-direction: row;
-justify-content: space-between;
-flex-wrap: nowrap;
-*/
 & {
   color: #ffffff;
 }
@@ -76,38 +71,43 @@ color: #dbdada;
 `;
 
 
-
-
-
-const base_url = "https://cdn2.thecatapi.com/images/";
-
-
-const loadImages = async (count) => {
-  const arr = [];
-  for (let i = 0; i < count; i++) {
-    const res = await fetch("https://api.thecatapi.com/v1/images/search");
-    const data = await res.json();
-    arr.push({ src: data[0].id });
-    await Sleep(100);
-  }
-  return arr;
-};
-
-function Sleep(milliseconds) {
-  return new Promise(resolve => setTimeout(resolve, milliseconds));
-}
-
-const LikeWrapper = styled.img`
+const LikeImage = styled.img`
 width: 1em;
 height: 1em;
 cursor: pointer;
 `;
 
-function Feed({filter}) {
+const LikeNumber = styled.span`
+margin-right: 0.5em;
+font-weight: 200;
+`;
 
-  ;
+const TitleWrapper = styled.div`
+grid-area: title;
+`;
+
+const AuthorWrapper = styled.div`
+grid-area: author;
+font-style: italic;
+font-weight: 300;
+`;
+
+const TimeWrapper = styled.div`
+grid-area: time;
+font-weight: 300;
+`;
+
+const LikeWrapper = styled.div`
+grid-area: like;
+display: flex;
+
+`;
+
+function Feed({filter, user, showLoginMask}) {
+
   
-  const [posts, setPosts] = useState([])
+  const [posts, setPosts] = useState([]);
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -118,12 +118,40 @@ function Feed({filter}) {
                   },
                   credentials: 'include'
             });
-      const data = await response.json()
+      const resjson = await response.json()
+      const data = resjson.map(element => {
+        let new_element = element;
+        let liked_by = JSON.parse(element.liked_by)
+        if (typeof liked_by === 'object' && !Array.isArray(liked_by) && liked_by !== null) {
+          if (Object.keys(liked_by).length === 0) {
+            liked_by = [];
+          }
+        }
+        new_element.liked_by = liked_by;
+        return new_element;
+      });
+      
       setPosts([...data]);
     };
 
+    const fetchUsers = async () => {
+      const response = await fetch("http://127.0.0.1:80/catwork/user", {
+        method: "GET",
+        headers: {
+                "Accept": "application/json"
+        },
+        credentials: 'include'
+      });
+      const resjson = await response.json()
+      setUsers([...resjson])
+    }
+
+
     fetchPost();
-    }, [filter])
+    fetchUsers();
+
+    //console.log(users)
+    }, [filter, user])
   
     const getDateString = (time) => {
       const dt = new Date(time.replace(' ', 'T'));
@@ -149,42 +177,122 @@ function Feed({filter}) {
       return rs;
     }
 
-    const [liked, setLiked] = useState([]);
     
     const toggleLike = (id) => {
-    
-      let arr = [...liked];
-        if (arr.includes(id)) {
-          arr = arr.filter(item => item != id)
+      
+      if(!user){
+          showLoginMask();
+          return;
         }
-        else {
-          arr.push(id);
+
+        let method = "POST";
+
+
+        let post = posts.find(element => element.id == id);
+
+        if(post.liked_by.includes(user.id)){
+          method = "DELETE";
         }
-          //call server
-        setLiked(arr)
+
+
+      fetch("http://127.0.0.1:80/catwork/like/" + id, {method: method, credentials: "include"})
+        .then(res => {
+          if(res.status == 404){
+            toast.warn("post does not exist")
+            throw "post does not exist"
+          }
+          if(res.status == 403){
+            toast.warn("unauthorized")
+            throw "post does not exist"
+          }
+          
+          return res.json();
+        })
+        .then(data => {
+            if (data["success"]){
+              const updatedPosts = posts.map(post => {
+                if (post.id === id) {
+                  const updatedLikedBy = method === "POST" 
+                    ? (post.liked_by.includes(user.id) ? [...post.liked_by] : [...post.liked_by, user.id])
+                    : post.liked_by.filter(userId => userId !== user.id);
+                  return { ...post, liked_by: updatedLikedBy };
+                }
+                return post;
+              });
+              setPosts(updatedPosts);
+            };
+        })
+        .catch(error => {
+          toast.error("failed to like");
+        });
     }
+
+
     const justLike = (id) =>{
-      let arr = [...liked];
-      if (!arr.includes(id)) {
-        arr.push(id);
-      }
-      setLiked(arr);
+
+      if(!user)
+        {
+          showLoginMask();
+          return;
+        }
+
+        let post = posts.find(element => element.id == id);
+        if(post.liked_by.includes(user.id)){
+          return;
+        }
+
+        
+        fetch("http://127.0.0.1:80/catwork/like/" + id, {method: "POST", credentials: "include"})
+        .then(res => {
+          if(res.status == 404){
+            toast.warn("post does not exist")
+            throw "post does not exist"
+          }
+          if(res.status == 403){
+            toast.warn("unauthorized")
+            throw "post does not exist"
+          }
+          
+          return res.json();
+        })
+        .then(data => {
+            if (data["success"]){
+              const updatedPosts = posts.map(post => {
+                if (post.id === id) {
+                  const updatedLikedBy = [...post.liked_by, user.id];
+                  return { ...post, liked_by: updatedLikedBy };
+                }
+                return post;
+              });
+              setPosts(updatedPosts);
+            };
+        })
+        .catch(error => {
+          toast.error("failed to like");
+        });
     }
-    //[{src: base_url + "2al.jpg"}, {src: base_url + "83l.jpg"}, {src: base_url + "8ji.jpg"} ])
-  //.filter((element) => element.src.includes(filter))
+
+
     return (
       <FeedWrapper>
         {posts.sort((a, b) => (a.timestamp - b.timestamp)).map((element, id) => {
+                    
+          
             return ( 
               <PostWrapper key={element.id} onDoubleClick={() => justLike(element.id)}>
                 <PostImg src={element.image} />
                 <PostDesc>
                   <DescriptionHeader>
-                    <span style={{fontStyle: "italic", "grid-area" : "title"}}>{element.title}</span>
-                    {/*<span style={{"grid"}}>&nbsp; - &nbsp;</span>*/}
-                    <span style={{fontStyle: "italic", "grid-area" : "author"}}>{element.author_id /*todo replace with name*/}</span> 
-                    <span style={{fontStyle: "italic", "grid-area" : "time"}}>{getDateString(element.timestamp)}</span>
-                    <span style={{fontStyle: "italic", "grid-area" : "like"}} onClick={() => toggleLike(element.id)}><LikeWrapper src={liked.includes(element.id) ? FullHeart : EmptyHeart }/></span>
+                    <TitleWrapper>{element.title}</TitleWrapper>
+                    <AuthorWrapper>{users.find(e => e.id == element.author_id)?.username ?? "unknown"}</AuthorWrapper> 
+                    <TimeWrapper>{getDateString(element.timestamp)}</TimeWrapper>
+                    <LikeWrapper onClick={() => toggleLike(element.id)}>
+                        <LikeNumber>
+                          {element.liked_by.length > 0 ? element.liked_by.length : " "} 
+                        </LikeNumber>
+                        
+                      <LikeImage src={element.liked_by.includes((user?.id) ?? -1) ? FullHeart : EmptyHeart }/>
+                    </LikeWrapper>
                   </DescriptionHeader>
                   <DescriptionBody>
                     {element.description}

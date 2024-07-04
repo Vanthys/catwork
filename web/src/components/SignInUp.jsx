@@ -225,7 +225,7 @@ const SignInUp = ({onClose, setUser}) => {
         return res.json()
       })
       .then((data) => {
-        console.log(data)
+        //console.log(data)
         setUser(data["user"]);
         document.cookie = "id=" + data["cookie"] + ";";
         toast.success("sign up successful")

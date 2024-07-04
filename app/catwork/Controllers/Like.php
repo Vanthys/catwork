@@ -2,26 +2,35 @@
 
 class Controllers_Like extends Controllers_Base
 {
-    private $model;
+    private Models_Post $post_model;
+    private Models_User $user_model;
+
 
     public function __construct(Views_Base $view, array $params)
     {
         parent::__construct($view, $params);
-        $this->model = new Models_Post();
+        $this->post_model = new Models_Post();
+        $this->user_model = new Models_User();
     }
 
     public function post()
     {
-        if (!isset($this->params[0]) or !isset($this->params[1])) {
+        Utils_Login::check_session_or_error();
+
+        //we actually already have the user here
+
+        if (!isset($this->params[0])) {
             http_response_code(400);
             echo json_encode(['error' => 'Invalid parameters']);
             die();
         }
+
+        $user = $this->user_model->getUserByToken($_SESSION["user"]);
         $postId = $this->params[0];
-        $authorId = $this->params[1];
+        $authorId = $user->id;
 
         try{
-            $this->model->set_likes($postId,$authorId);
+            $this->post_model->set_likes($postId,$authorId);
             http_response_code(200);
             echo json_encode(['success' => 'Liked']);
         } catch(Exceptions_NotFound $e){
@@ -32,16 +41,20 @@ class Controllers_Like extends Controllers_Base
 
     public function delete()
     {
-        if (!isset($this->params[0]) or !isset($this->params[1])) {
+        Utils_Login::check_session_or_error();
+
+        if (!isset($this->params[0])) {
             http_response_code(400);
             echo json_encode(['error' => 'Invalid parameters']);
             die();
         }
         $postId = $this->params[0];
-        $authorId = $this->params[1];
+        $user = $this->user_model->getUserByToken($_SESSION["user"]);
+        $authorId = $user->id;
 
+        error_log($user->username);
         try{
-            $this->model->remove_likes($postId,$authorId);
+            $this->post_model->remove_likes($postId,$authorId);
             http_response_code(200);
             echo json_encode(['success' => 'Like removed']);
         } catch(Exceptions_NotFound $e){

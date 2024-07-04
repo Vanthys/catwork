@@ -39,7 +39,7 @@ function App() {
   return (
     <>
       <ProfileBubble user={user} showLoginMask={showLoginMask} filterCallback={setFilter} setUser={setUser} />
-      <Feed filter={filter} />
+      <Feed filter={filter} user={user} showLoginMask={showLoginMask} />
       <PostButton update={update} showLoginMask={showLoginMask} user={user} />
 
       <Modal isOpen={loginMask} onClose={() => setLoginMask(false)}>
