@@ -42,14 +42,15 @@ class Models_Post extends Models_Base
 
     public function insert(Domains_Post $obj): Domains_Post
     {
-        $query = "INSERT INTO post (author_id, title, description, image, timestamp) VALUES (:author_id, :title, :description, :image, :timestamp);";
+        $query = "INSERT INTO post (author_id, title, description, image, timestamp, liked_by) VALUES (:author_id, :title, :description, :image, :timestamp, :liked_by);";
         $statement = $this->connection->prepare($query);
         $statement->execute([
             ":author_id" => $obj->author_id,
             ":title" => $obj->title,
             ":description" => $obj->description,
             ":image" => $obj->image,
-            ":timestamp" => $obj->timestamp
+            ":timestamp" => $obj->timestamp,
+            ":liked_by" => "[]"
         ]);
         $lastId = $this->connection->lastInsertId();
         return $this->findById($lastId);

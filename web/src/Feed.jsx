@@ -121,10 +121,14 @@ function Feed({filter, user, showLoginMask}) {
       const resjson = await response.json()
       const data = resjson.map(element => {
         let new_element = element;
+        console.log(element.liked_by  )
         let liked_by = JSON.parse(element.liked_by)
         if (typeof liked_by === 'object' && !Array.isArray(liked_by) && liked_by !== null) {
           if (Object.keys(liked_by).length === 0) {
             liked_by = [];
+          }
+          else {
+            liked_by = Object.values();
           }
         }
         new_element.liked_by = liked_by;
