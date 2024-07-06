@@ -10,9 +10,11 @@ bottom: 2em;
 right: 2em;
 width: 3em;
 height: 3em;
+border-radius: 50%;
 display: flex;
 justify-content: center;
 align-items: center;
+background-color: black;
 `;
 
 const ImageWrapper = styled.img`

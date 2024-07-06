@@ -283,10 +283,10 @@ function Feed({filter, user, showLoginMask}) {
     return (
       <FeedWrapper>
          {loading
-        ? Array(20)
+        ? Array(1)
             .fill()
             .map((_, index) => (
-              <Skeleton key={index} height="400px" width="300px" />
+              <h2>Loading ...</h2>
             ))
         :
         posts.sort((a, b) => (a.timestamp - b.timestamp)).map((element, id) => {
