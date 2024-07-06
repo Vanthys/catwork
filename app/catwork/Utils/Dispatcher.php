@@ -26,12 +26,17 @@ class Utils_Dispatcher
             $view_type = str_contains( strtolower($_SERVER["HTTP_ACCEPT"]), "application/json") ? "Json" : "Html";
         }
         $view_type = "Views_" . $view_type;
+        $view_type = "Views_Json"; //for now always set to JSON;
 
         $view = new $view_type($resource_type, $path_params);
 
         try {
             $controller_name = "Controllers_" . $resource_type;
-            $controller_instance = new $controller_name($view, $path_params);
+            if (class_exists($controller_name)) {
+                $controller_instance = new $controller_name($view, $path_params);
+            }else{
+                throw new Exceptions_BadRequest("path not found: " . $resource_type);
+            }
 
             $verb = strtolower($_SERVER['REQUEST_METHOD']);
 
@@ -51,10 +56,16 @@ class Utils_Dispatcher
                  parse_str(file_get_contents("php://input"),$GLOBALS["_PUT"]);
             }
             */
-            $controller_instance->$verb();
+            if (method_exists($controller_instance, $verb)) {
+                $controller_instance->$verb();
+            }
+            else{
+                throw new Exceptions_BadRequest('Invalid verb');
+            }
+
 
         } catch (Exception $e) {
-            echo $e->getMessage();
+            #echo $e->getMessage();
             $controller = new Controllers_Error($view, $path_params);
             $controller->error($e);
         }

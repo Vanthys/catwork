@@ -29,6 +29,7 @@ Content-Type: application/json
 ### Get User Details
 GET http://localhost/catwork/user/admin
 Accept: application/json
+Content-Type: application/json
 
 
 ### Logout
@@ -52,6 +53,10 @@ Content-Type: application/json
 
 ### Like Image
 POST http://localhost/catwork/like/1
+Accept: application/json
+Content-Type: application/json
 
 ### Remove Like Image
 DELETE http://localhost/catwork/like/1
+Accept: application/json
+Content-Type: application/json

@@ -9,49 +9,33 @@ class Controllers_Login extends Controllers_Base {
         $this->model = new Models_User();
     }
 
+    /**
+     * @throws Exceptions_BadRequest
+     * @throws Exceptions_Unauthorized
+     * @throws Exceptions_NotFound
+     */
     public function post()
     {
         $data = $_POST;
-        if (empty($data) or !isset($data["user"]) or !isset($data["password"])) {
-            http_response_code(400);
-            echo json_encode(['error' => 'Invalid or missing data']);
-            die();
+
+        if (!is_array($data) || empty($data) || !isset($data["user"]) || !isset($data["password"])) {
+            throw new Exceptions_BadRequest("Invalid or missing data");
         }
 
 
         $user = $this->model->login($data["user"], $data["password"]);
         if ($user == null) {
-            http_response_code(403);
-            echo json_encode(['error' => 'Unauthenticated']);
-            //$this->view->render(new Exception("Unauthenticated"));
+            throw new Exceptions_Unauthorized("are you logged in?");
         }
         $details = $this->model->getFullUser($user->username);
         $token = Utils_Login::getUserCookie($user);
         Utils_Login::register_session($token);
-
+        $this->view->render(['user' => $details]);
+        /*
         header('Content-type: application/json');
         echo json_encode([
-            'user' => $details,
-            'cookie' => $token
+            'user' => $details
         ]);
-
-    }
-
-    public function get() {
-        // TODO this is unsafe, use POST!
-        $user = $_GET["user"];
-        $pw = $_GET["password"];
-
-        $user = $this->model->login($user, $pw);
-        if ($user == null) {
-            http_response_code(403);
-            $this->view->render(new Exception("Unauthenticated"));
-        }
-
-
-        Utils_Login::register_session($user);
-        header('Content-type: application/json');
-        echo json_encode([$user]);
-        die();
+    */
     }
 }

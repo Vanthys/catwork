@@ -158,7 +158,7 @@ const NewPost = ({ user, toggleModal, update }) => {
         }
 
 
-        fetch("http://127.0.0.1:80/catwork/post", {
+        fetch(import.meta.env.VITE_BASE_URL + "/catwork/post", {
             method: "POST",
             headers: {
                 "Accept": "application/json",

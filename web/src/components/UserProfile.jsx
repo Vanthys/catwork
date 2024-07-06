@@ -78,7 +78,7 @@ const UserProfile = ({name, bio, img, onClose, setUser}) => {
 
 
   const LogOut = (e) => {
-    fetch("http://localhost:80/catwork/logout", {
+    fetch(import.meta.env.VITE_BASE_URL + "/catwork/logout", {
       method: "GET",
       credentials: 'include'
     });

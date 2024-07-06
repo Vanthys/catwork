@@ -33,6 +33,7 @@ class Utils_Login
         $headers = getallheaders();
         if (!isset($_SESSION['user'])) {
         ##if (!isset($headers['Authorization'])) {
+            /*
             http_response_code(403);
             echo json_encode(
                 [
@@ -40,6 +41,8 @@ class Utils_Login
                     //"[debug]headers" => getallheaders()
                 ]);
             die();
+           */
+            throw new Exceptions_Unauthorized("Are you logged in?");
         }
     }
 }

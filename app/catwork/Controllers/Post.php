@@ -3,34 +3,37 @@
 class Controllers_Post extends Controllers_Base
 {
 
-    private $model;
+    private Models_Post $post_model;
+    private Models_User $user_model;
 
     public function __construct(Views_Base $view, array $params)
     {
         parent::__construct($view, $params);
-        $this->model = new Models_Post();
+        $this->post_model = new Models_Post();
+        $this->user_model = new Models_User();
     }
 
 
     public function get()
     {
         if ($this->params) {
-            $data = $this->model->findById($this->params[0]);
+            $data = $this->post_model->findById($this->params[0]);
         } else {
-            $data = $this->model->findAll();
+            $data = $this->post_model->findAll();
         }
         $this->view->render($data);
     }
 
+    /**
+     * @throws Exceptions_BadRequest
+     */
     public function post()
     {
 
         Utils_Login::check_session_or_error();
         $data = $_POST;
         if (empty($data)) {
-            http_response_code(400);
-            echo json_encode(['error' => 'Invalid or missing data']);
-            die();
+           throw new Exceptions_BadRequest("invalid parameters");
         }
 
         //here we need to set $data->timestamp to the current server  datetime()
@@ -38,21 +41,19 @@ class Controllers_Post extends Controllers_Base
 
         $obj = new Domains_Post($data);
 
-        $newPost = $this->model->insert($obj);
 
+        $user = $this->user_model->getUserByToken($_SESSION["user"]);
+
+        if ($user->id != $data["author_id"]) {
+            throw new Exceptions_BadRequest("You are not who you say you are");
+        }
+
+        $newPost = $this->post_model->insert($obj);
+
+        //TODO, how can I send specific response codes
         http_response_code(301);
         echo json_encode($newPost);
 
         die();
-    }
-
-
-
-    public function delete() {
-        if (!isset($this->params[0]) or !isset($this->params[1])) {
-            throw new Exception("Id not found");
-        }
-        $this->model->delete($this->params[0],$this->params[1]);
-        http_response_code(204);
     }
 }

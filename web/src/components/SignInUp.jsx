@@ -157,7 +157,7 @@ const SignInUp = ({onClose, setUser}) => {
       e.preventDefault();
       const username = e.target.username.value;
       const password = e.target.password.value; 
-      fetch("http://127.0.0.1:80/catwork/login", {
+      fetch(import.meta.env.VITE_BASE_URL + "/catwork/login", {
         method: "POST",
         headers: {
             "Accept": "application/json",     
@@ -205,7 +205,7 @@ const SignInUp = ({onClose, setUser}) => {
         }
       
       
-      fetch("http://127.0.0.1:80/catwork/signup", {
+      fetch(import.meta.env.VITE_BASE_URL + "/catwork/signup", {
         method: "POST",
         headers: {
             "Accept": "application/json",     
