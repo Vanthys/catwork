@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react"
 import styled from "styled-components";
+import Skeleton from "react-loading-skeleton";
+import 'react-loading-skeleton/dist/skeleton.css'
 import EmptyHeart from "./assets/heart_empty.svg";
 import FullHeart from "./assets/heart_full.svg";
 import { toast } from "react-toastify";
@@ -108,6 +110,7 @@ function Feed({filter, user, showLoginMask}) {
   
   const [posts, setPosts] = useState([]);
   const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -147,6 +150,7 @@ function Feed({filter, user, showLoginMask}) {
       });
       const resjson = await response.json()
       setUsers([...resjson])
+      setLoading(false);
     }
 
 
@@ -278,7 +282,14 @@ function Feed({filter, user, showLoginMask}) {
 
     return (
       <FeedWrapper>
-        {posts.sort((a, b) => (a.timestamp - b.timestamp)).map((element, id) => {
+         {loading
+        ? Array(20)
+            .fill()
+            .map((_, index) => (
+              <Skeleton key={index} height="400px" width="300px" />
+            ))
+        :
+        posts.sort((a, b) => (a.timestamp - b.timestamp)).map((element, id) => {
                     
           
             return ( 
