@@ -202,7 +202,15 @@ function Feed({filter, user, showLoginMask}) {
         }
 
 
-      fetch(import.meta.env.VITE_BASE_URL + "/catwork/like/" + id, {method: method, credentials: "include"})
+      fetch(import.meta.env.VITE_BASE_URL + "/catwork/like/" + id, {
+        method: method,
+        credentials: "include",
+        headers : {
+          "Accept": "application/json",
+          "Content-Type": "application/json"
+        }
+      }
+      )
         .then(res => {
           if(res.status == 404){
             toast.warn("post does not exist")
@@ -249,7 +257,16 @@ function Feed({filter, user, showLoginMask}) {
         }
 
         
-        fetch(import.meta.env.VITE_BASE_URL + "/catwork/like/" + id, {method: "POST", credentials: "include"})
+        fetch(import.meta.env.VITE_BASE_URL + "/catwork/like/" + id,
+           {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              "Accept": "application/json",
+              "Content-Type": "application/json"
+            }  
+          }
+          )
         .then(res => {
           if(res.status == 404){
             toast.warn("post does not exist")
