@@ -1,2 +1,9 @@
-<?php
-    print($data);
+<?php include __DIR__."/_header.phtml"; ?>
+<?php /** @var Exceptions_Statuscode $data */ ?>
+<div style="text-align: center; background-color: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+    <div style="font-size: 48px; color: #333;"><?=$data->statuscode?></div>
+    <div style="font-size: 24px; color: #666;"><?=$data->error?></div>
+    <div style="font-size: 12px; color: #AAA;"><?=print($data)?></div>
+</div>
+<?php include __DIR__ . "/_footer.phtml"; ?>
+
