@@ -15,9 +15,7 @@ class Controllers_User extends Controllers_Base {
         $data = null;
 
         if ($this->params) {
-            $user = $this->model->getFullUser($this->params[0]);
-            $data = $user->toArray();
-            unset($data['password']); // to make sure the password could not be leaked delete the key "password"
+            $data = $this->model->getFullUser($this->params[0]);
         } else {
             $data = $this->model->findAll();
         }

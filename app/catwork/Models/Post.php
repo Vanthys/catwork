@@ -72,7 +72,7 @@ class Models_Post extends Models_Base
         $statement->execute([":id" => $id]);
         $data = $statement->fetch(PDO::FETCH_ASSOC);
         if ($data) {
-            $liked_by = (array)json_decode($data['liked_by']);
+            $liked_by = (array)json_decode($data['liked_by'], true);
 
             if (!in_array($author_id, $liked_by)) {
                 $liked_by[] = $author_id;
@@ -96,7 +96,8 @@ class Models_Post extends Models_Base
         $statement->execute([":id" => $id]);
         $data = $statement->fetch(PDO::FETCH_ASSOC);
         if ($data) {
-            $liked_by = (array)json_decode($data['liked_by']);
+            $liked_by = (array)json_decode($data['liked_by'], true);
+
             if (in_array($author_id, $liked_by)) {
                 $liked_by = array_diff($liked_by, [$author_id]);
             }

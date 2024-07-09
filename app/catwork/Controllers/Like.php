@@ -32,10 +32,6 @@ class Controllers_Like extends Controllers_Base
 
         $this->post_model->set_likes($postId,$authorId);
         $this->view->render(['success' => 'Liked']);
-        /*
-        http_response_code(200);
-        echo json_encode(['success' => 'Liked']);
-    */
     }
 
     public function delete()
