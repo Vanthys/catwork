@@ -32,6 +32,11 @@ Accept: application/json
 Content-Type: application/json
 
 
+### Get all user stuff
+GET http://localhost/catwork/user
+Accept: application/json
+Content-Type: application/json
+
 ### Logout
 GET http://localhost/catwork/logout
 

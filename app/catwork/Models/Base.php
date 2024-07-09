@@ -6,9 +6,9 @@ abstract class Models_Base {
 
     public function __construct() {
         $host = "127.0.0.1";
-        $dbname = "catwork";
-        $username = "root";
-        $password = "";
+        $dbname = "fh_2024_team_1";
+        $username = "fh_2024_webphp";
+        $password = "fh_2024_webphp";
         $this->connection = new PDO('mysql:host=' . $host . '; dbname=' . $dbname . ';', $username, $password);
     }
 }
