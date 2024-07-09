@@ -1,28 +1,32 @@
 
+#HTML todo: show usefull html stuff with browser
+
+# JSON
+### unknown verb (json)
+PATCH http://localhost/catwork/post
+Accept: application/json
+
+### unknown controller (json)
+PATCH http://localhost/catwork/adsdg
+Accept: application/json
+
+
 ### Get all posts
 GET http://localhost/catwork/post
 Accept: application/json
 
-
-
-
-
-
-### Login
-POST http://localhost/catwork/login
+### Get specific post
+GET http://localhost/catwork/post
 Accept: application/json
-Content-Type: application/json
 
-{ "user": "admin",
-    "password": "password"}
-
-
-### SignUp
+### SignUp (should fail)
 POST http://localhost/catwork/signup
 Accept: application/json
 Content-Type: application/json
 
 { "username": "admin", "password" : "doesn't matter"}
+
+
 
 
 
@@ -32,17 +36,23 @@ Accept: application/json
 Content-Type: application/json
 
 
-### Get all user stuff
+### Get all users (only id and username, to improve frontend)
 GET http://localhost/catwork/user
 Accept: application/json
 Content-Type: application/json
 
-### Logout
-GET http://localhost/catwork/logout
 
 
+### Login (user_id = 1)
+POST http://localhost/catwork/login
+Accept: application/json
+Content-Type: application/json
 
-### Post new Image
+{ "user": "admin",
+  "password": "password"}
+
+
+### Post new Image (requires login)
 POST http://localhost/catwork/post
 Accept: application/json
 Content-Type: application/json
@@ -56,12 +66,16 @@ Content-Type: application/json
 }
 
 
-### Like Image
+### Like Image (requires login)
 POST http://localhost/catwork/like/1
 Accept: application/json
 Content-Type: application/json
 
-### Remove Like Image
+### Remove Like Image (requires login)
 DELETE http://localhost/catwork/like/1
 Accept: application/json
 Content-Type: application/json
+
+
+### Logout
+GET http://localhost/catwork/logout
