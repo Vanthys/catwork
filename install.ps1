@@ -1,46 +1,64 @@
-Write-Output "[INFO]: Installation script stated"
+param (
+    [Alias("skip-app")][switch]$skipApp,
+    [Alias("skip-web")][switch]$skipWeb,
+    [Alias("skip-db")][switch]$skipDb
+)
 
-Set-Location web
-$nodeVersion = node -v 2>&1
 
-if ($nodeVersion -match "command not found" -or $nodeVersion -match "is not recognized") {
-    Write-Host "[INFO]: Node.js not installed. Skipping web re-build."
+
+Write-Host "[INFO]: Installation script started"
+Write-Host "[INFO]: WEB: $skipWeb, APP: $skipApp, DB: $skipDb"
+
+if (-not $skipWeb) {
+    Set-Location web
+    $nodeVersion = node -v 2>&1
+
+    if ($nodeVersion -match "command not found" -or $nodeVersion -match "is not recognized") {
+        Write-Host "[INFO]: Node.js not installed. Skipping web re-build."
+    } else {
+        Write-Host "[INFO]: Node.js is installed, version: $nodeVersion"
+        npm install
+        npm run build
+    }
+
+    if (Test-Path -Path C:\xampp\htdocs\assets) {
+        Remove-Item C:\xampp\htdocs\assets -Recurse
+        Write-Host "[INFO]: Removed old web installation"
+    }
+    Set-Location ..
+
+    Copy-Item -Path .\web\dist\* -Destination C:\xampp\htdocs\ -Recurse
+    Write-Host "[INFO]: Web installed"
 } else {
-    Write-Output "[INFO]: Node.js is installed, version: $nodeVersion"
-    npm install
-    npm run build
+    Write-Host "[INFO]: Skipping web installation"
 }
 
+if (-not $skipApp) {
+    if (Test-Path -Path C:\xampp\htdocs\catwork) {
+        Remove-Item C:\xampp\htdocs\catwork -Recurse
+        Write-Host "[INFO]: Removed old app installation"
+    }
 
-if (Test-Path -Path C:\xampp\htdocs\assets){
-    Remove-Item C:\xampp\htdocs\assets -Recurse
-    Write-Host "[INFO]: Removed old web installation"
-}
-Set-Location ..
-
-Copy-Item -Path .\web\dist\* -Destination C:\xampp\htdocs\ -Recurse
-Write-Host "[INFO]: Web installed"
-
-if (Test-Path -Path C:\xampp\htdocs\catwork){
-    Remove-Item C:\xampp\htdocs\catwork -Recurse
-    Write-Host "[INFO]: Removed old app installation"
+    Copy-Item -Path .\app\catwork -Destination C:\xampp\htdocs\ -Recurse
+    Write-Host "[INFO]: App installed"
+} else {
+    Write-Host "[INFO]: Skipping app installation"
 }
 
-Copy-Item -Path .\app\catwork -Destination C:\xampp\htdocs\ -Recurse
-Write-Host "[INFO]: App installed"
+if (-not $skipDb) {
+    Write-Host "[INFO]: Importing Database"
+    $mysqlHost = "localhost"
+    $mysqlUser = "fh_2024_webphp"
+    $mysqlPassword = "fh_2024_webphp"
+    $sqlScriptPath = "./app/fh_2024_team_1.sql"
 
+    $mysqlCommand = "C:\xampp\mysql\bin\mysql.exe -h $mysqlHost -u $mysqlUser -p$mysqlPassword"
+    Start-Process "cmd.exe" -ArgumentList "/c $mysqlCommand < $sqlScriptPath" -NoNewWindow -Wait
+    Write-Host "[INFO]: Imported Database"
+} else {
+    Write-Host "[INFO]: Skipping database import"
+}
 
-
-Write-Host "[INFO]: Importing Database"
-$mysqlHost = "localhost"
-$mysqlUser = "fh_2024_webphp"
-$mysqlPassword = "fh_2024_webphp"
-$sqlScriptPath = "./app/fh_2024_team_1.sql"
-
-$mysqlCommand = "C:\xampp\mysql\bin\mysql.exe -h $mysqlHost -u $mysqlUser -p$mysqlPassword"
-Start-Process "cmd.exe" -ArgumentList "/c $mysqlCommand < $sqlScriptPath" -NoNewWindow -Wait
-Write-Host "[INFO]: Imported Database"
-Write-Host "\n\n"
 Write-Host "[INFO]: Installation finished" -ForegroundColor Green
 
 $headers = @("Username", "Password")
@@ -62,6 +80,3 @@ foreach ($row in $rows) {
 Write-Host ""
 Write-Host "Use the credentials above to log in, or create your own user using sign up."
 Write-Host "Visit: http://localhost/catwork"
-
-
-

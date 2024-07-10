@@ -166,7 +166,16 @@ const SignInUp = ({onClose, setUser}) => {
         credentials: 'include',
         body: JSON.stringify({"user": username, "password": password})
       })
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.status == 401 || res.status == 403){
+          throw new "sign in failed";
+        }
+        if (res.status != 200){
+          throw new "unknown error"
+        }
+
+        return res.json();
+      })
       .then((data) => {
         setUser(data["user"]);
         document.cookie = "id=" + data["cookie"] + ";";
